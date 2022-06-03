@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 class Main{
@@ -56,6 +53,18 @@ class Main{
         // It writes the optimal value it finds and the color values of all vertexes.
         System.out.println(optimal);
         System.out.println(colors);
+
+        try{
+            File dosya = new File("output.txt");
+            FileWriter yazici = new FileWriter(dosya);
+            BufferedWriter yaz = new BufferedWriter(yazici);
+            yaz.write(optimal + "\n" + colors);
+            yaz.close();
+            System.out.println("\n[✓] Output file is created according to the specified input file.");
+        }
+        catch(Exception hata){
+            hata.printStackTrace();
+        }
     }
 
     public static void main(String[] args)
