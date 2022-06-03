@@ -46,19 +46,21 @@ class Main{
 
             // The 1 upper value of the highest color value gives the optimal value. (Because 0 is included.)
             // Therefore, it checks whether the value found in each step is the maximum value.
-            if(result.get(i)>optimal)
+            if(result.get(i)>=optimal)
                 optimal = result.get(i)+1;
         }
 
         // It writes the optimal value it finds and the color values of all vertexes.
-        System.out.println(optimal);
-        System.out.println(colors);
+        String outputString = optimal + "\n" + colors;
+        System.out.println(outputString);
 
+
+        // Writes the output in 'output.txt'.
         try{
             File dosya = new File("output.txt");
             FileWriter yazici = new FileWriter(dosya);
             BufferedWriter yaz = new BufferedWriter(yazici);
-            yaz.write(optimal + "\n" + colors);
+            yaz.write(outputString);
             yaz.close();
             System.out.println("\n[✓] Output file is created according to the specified input file.");
         }
