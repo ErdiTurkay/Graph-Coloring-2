@@ -6,27 +6,29 @@ import java.util.*;
 
 class Main{
 
-    // Function to assign colors to vertices of a graph
     public static void colorGraph(Graph graph, int n)
     {
-        // keep track of the color assigned to each vertex
+        // Keep track of the color assigned to each vertex.
         Map<Integer, Integer> result = new HashMap<>();
 
-        // assign a color to vertex one by one
-        for (int u = 0; u < n; u++)
+        String colors = "";
+        int optimal = 0;
+
+        // Assign a color to vertex one by one.
+        for (int i = 0; i < n; i++)
         {
-            // set to store the color of adjacent vertices of `u`
+            // Set to store the color of adjacent vertices of 'i'
             Set<Integer> assigned = new TreeSet<>();
 
-            // check colors of adjacent vertices of `u` and store them in a set
-            for (int i: graph.adjList.get(u))
+            // Controls the colors of the vertices adjacent to i and stores these values.
+            for (int x: graph.adjList.get(i))
             {
-                if (result.containsKey(i)) {
-                    assigned.add(result.get(i));
+                if (result.containsKey(x)) {
+                    assigned.add(result.get(x));
                 }
             }
 
-            // check for the first free color
+            // Controls the lowest possible color value.
             int color = 0;
             for (Integer c: assigned)
             {
@@ -36,63 +38,86 @@ class Main{
                 color++;
             }
 
-            // assign vertex `u` the first available color
-            result.put(u, color);
+            // Assigns the lowest color value it finds to vertex.
+            result.put(i, color);
         }
 
-        String colors = "";
-        int optimal = 0;
-
-        for (int v = 0; v < n; v++)
+        for (int i = 0; i < n; i++)
         {
-            colors += result.get(v) + " ";
+            // Writes the color value of all vertexes side by side.
+            colors += result.get(i) + " ";
 
-            if(result.get(v)>optimal)
-                optimal = result.get(v);
+            // The 1 upper value of the highest color value gives the optimal value. (Because 0 is included.)
+            // Therefore, it checks whether the value found in each step is the maximum value.
+            if(result.get(i)>optimal)
+                optimal = result.get(i)+1;
         }
 
+        // It writes the optimal value it finds and the color values of all vertexes.
         System.out.println(optimal);
         System.out.println(colors);
     }
 
-    // Greedy coloring of a graph
     public static void main(String[] args)
     {
-        File file = new File("sample2.txt");
-        int vertexNumber = 0;
-        ArrayList edgeList = new ArrayList();
+        Scanner scn = new Scanner(System.in);
 
-        try {
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    String[] columns = line.split(" ");
-                    if(columns[0].equals("p")) {
-                        vertexNumber = Integer.parseInt(columns[1]);
-                        break;
+        while(true){
+            System.out.print("Enter the file name to be read. (including .txt): ");
+            String input = scn.nextLine();
+            File file = new File(input);
+            int vertexCount = 0;
+            ArrayList edgeList = new ArrayList();
+
+            // If the file whose name is entered is not located in the current location,
+            // a check is made to give an error message.
+            if(file.exists() && !file.isDirectory()) {
+                try {
+                    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            // Splits the line by spaces.
+                            String[] columns = line.split(" ");
+
+                            // If the line starts with p, this line gives us the vertex amount.
+                            if(columns[0].equals("p")) {
+                                vertexCount = Integer.parseInt(columns[1]);
+                                break;
+                            }
+                        }
                     }
+
+                    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            // Splits the line by spaces.
+                            String[] columns = line.split(" ");
+
+                            // If the line starts with e, this line tells us the edges. (from-to) also (to-from)
+                            if(columns[0].equals("e")) {
+                                // Creates an Edge object and adds it to the list.
+                                Edge newEdge = new Edge(Integer.parseInt(columns[1])-1, Integer.parseInt(columns[2])-1);
+                                edgeList.add(newEdge);
+                            }
+                        }
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+
+                // Create a Graph object based on the given edges and vertex count.
+                Graph graph = new Graph(edgeList, vertexCount);
+
+                // Colors the graph according to the given graph object and vertex count.
+                colorGraph(graph, vertexCount);
+
+                break;
             }
 
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    String[] columns = line.split(" ");
-                    if(columns[0].equals("e")) {
-                        Edge newEdge = new Edge(Integer.parseInt(columns[1])-1, Integer.parseInt(columns[2])-1);
-                        edgeList.add(newEdge);
-                    }
-                }
+            else{
+                System.out.println("[!] The file you are looking for was not found, please try again.\n");
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-        // build a graph from the given edges
-        Graph graph = new Graph(edgeList, vertexNumber);
-
-        // color graph using the greedy algorithm
-        colorGraph(graph, vertexNumber);
     }
 }
